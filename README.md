@@ -43,6 +43,7 @@ This sample is an ASP.NET Core WebAPI application designed to "fork and code" wi
 |-----------------------|--------------------------------------------|
 | `.gitignore`          | Define what to ignore at commit time |
 | `azure-pipelines.yml` | Azure DevOps CI-CD Pipeline |
+| `CHANGELOG.md`        | Repo change log |
 | `CODE_OF_CONDUCT.md`  | Microsoft Open Source Code of Conduct |
 | `CONTRIBUTING.md`     | Guidelines for contributing to the repo |
 | `LICENSE`             | The license for the sample |
