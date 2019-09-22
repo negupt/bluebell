@@ -23,7 +23,7 @@ namespace Tiny
 
             listener.Start();
 
-            sem = new Semaphore(listenCount, listenCount, "HttpListenCount");
+            sem = new Semaphore(listenCount, listenCount);
             int requestId = 0;
 
             // Open and keep open listenCount listeners

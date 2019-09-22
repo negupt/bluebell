@@ -45,10 +45,10 @@ namespace HeliumIntegrationTest
                 int.TryParse(env, out sleepMs);
             }
 
-            env = Environment.GetEnvironmentVariable("THREADS");
+            env = Environment.GetEnvironmentVariable("FILES");
             if (!string.IsNullOrEmpty(env))
             {
-                int.TryParse(env, out threads);
+                // TODO - parse files
             }
 
             // process the command line args
@@ -72,8 +72,7 @@ namespace HeliumIntegrationTest
                         runWeb = true;
                     }
 
-
-                    // process all of the args in pairs
+                    // process all other args in pairs
                     else if (i < args.Length - 1)
                     {
                         // handle host (-h http://localhost:4120/)
@@ -104,10 +103,8 @@ namespace HeliumIntegrationTest
                         // handle sleep (-s sleepMS)
                         else if (args[i] == "-s")
                         {
-                            if (int.TryParse(args[i + 1], out sleepMs) && sleepMs > 0)
+                            if (int.TryParse(args[i + 1], out sleepMs))
                             {
-                                // set loop to true
-                                loop = true;
                                 i++;
                             }
                             else
@@ -158,6 +155,12 @@ namespace HeliumIntegrationTest
                 sleepMs = 0;
             }
 
+            if (sleepMs > 0)
+            {
+                // set loop to true
+                loop = true;
+            }
+
             if (threads < 1)
             {
                 threads = 1;
@@ -166,6 +169,12 @@ namespace HeliumIntegrationTest
             if (threads > 10)
             {
                 threads = 10;
+            }
+
+            if (fileList.Count == 0)
+            {
+                fileList.Add(defaultInputFile);
+                fileList.Add("dotnet.json");
             }
 
             Smoker.Test smoker = new Smoker.Test(fileList, baseUrl);
@@ -182,11 +191,9 @@ namespace HeliumIntegrationTest
 
             if (runWeb)
             {
-                // start the web server
-                Tiny.Web host = new Tiny.Web();
-
                 List<Task> tasks = new List<Task>();
 
+                // run the smoke test
                 if (loop)
                 {
                     for (int i = 0; i < threads; i++)
@@ -195,14 +202,10 @@ namespace HeliumIntegrationTest
                     }
                 }
 
-                await host.RunAsync(16, 4120);
+                // start the web server
+                await new Tiny.Web().RunAsync(16, 4120);
 
                 return;
-            }
-
-            if (fileList.Count == 0)
-            {
-                fileList.Add(defaultInputFile);
             }
 
             await smoker.RunLoop(sleepMs);
