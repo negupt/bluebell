@@ -19,13 +19,15 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 RUN groupadd -g 4120 helium && \
     useradd -r -u 4120 -g helium helium
 
-# run as teh helium user
+# run as the helium user
 USER helium
 
 WORKDIR /app
 COPY --from=build /app .
 
+EXPOSE 4120
+
 ENTRYPOINT [ "dotnet",  "integration-test.dll" ]
 
 # default to localhost
-CMD [ "-h","http://localhost:4120" ]
+CMD [ "-h","bluebell","-s","10","-t","3","-w","-i","integration-test.json","dotnet.json" ]
