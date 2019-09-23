@@ -22,9 +22,9 @@ RUN groupadd -g 4120 helium && \
 # run as the helium user
 USER helium
 
+EXPOSE 4122
+
 WORKDIR /app
 COPY --from=build /app .
-
-EXPOSE 4120
 
 ENTRYPOINT [ "dotnet",  "integration-test.dll" ]
