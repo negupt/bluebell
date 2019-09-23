@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Threading;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Smoker;
 
 namespace HeliumIntegrationTest
 {
-    // integration test for testing Helium (or any REST API)
-    partial class App
+    public class Program
     {
-        // main entry point
         public static async Task Main(string[] args)
         {
             int sleepMs = 0;
-            int threads = 1;
+            int threads = 0;
             bool runWeb = false;
             string baseUrl = "http://localhost:4120";
             string defaultInputFile = "integration-test.json";
@@ -155,7 +158,7 @@ namespace HeliumIntegrationTest
                 sleepMs = 0;
             }
 
-            if (sleepMs > 0)
+            if (threads > 0)
             {
                 // set loop to true
                 loop = true;
@@ -179,7 +182,7 @@ namespace HeliumIntegrationTest
 
             Smoker.Test smoker = new Smoker.Test(fileList, baseUrl);
 
-            if (!loop && ! runWeb)
+            if (!loop && !runWeb)
             {
                 if (!smoker.Run().Result)
                 {
@@ -203,7 +206,13 @@ namespace HeliumIntegrationTest
                 }
 
                 // start the web server
-                await new Tiny.Web().RunAsync(16, 4120);
+                IWebHostBuilder builder = WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
+
+                // listen on the port
+                builder.UseUrls(string.Format("http://*:{0}/", 4122));
+
+                IWebHost host = builder.Build();
+                await host.RunAsync();
 
                 return;
             }
