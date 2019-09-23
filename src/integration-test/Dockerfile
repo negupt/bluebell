@@ -28,6 +28,3 @@ COPY --from=build /app .
 EXPOSE 4120
 
 ENTRYPOINT [ "dotnet",  "integration-test.dll" ]
-
-# default to localhost
-CMD [ "-h","bluebell","-s","10","-t","3","-w","-i","integration-test.json","dotnet.json" ]
