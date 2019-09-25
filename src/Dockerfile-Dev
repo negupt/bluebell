@@ -1,6 +1,14 @@
 ### Build a developer version of the container
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2
 
+### Optional: Set Proxy Variables
+# ENV http_proxy {value}
+# ENV https_proxy {value}
+# ENV HTTP_PROXY {value}
+# ENV HTTPS_PROXY {value}
+# ENV no_proxy {value}
+# ENV NO_PROXY {value}
+
 RUN mkdir -p /src && \
     mkdir -p /root/.azure
 
