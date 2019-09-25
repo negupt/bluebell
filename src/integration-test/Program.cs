@@ -1,59 +1,119 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Smoker;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HeliumIntegrationTest
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        static int sleepMs = 0;
+        static int threads = 0;
+        static bool runWeb = false;
+        static string baseUrl = "http://localhost:4120";
+        static readonly string defaultInputFile = "integration-test.json";
+        static bool loop = false;
+        static readonly List<string> fileList = new List<string>();
+
+        public static void Main(string[] args)
         {
-            int sleepMs = 0;
-            int threads = 0;
-            bool runWeb = false;
-            string baseUrl = "http://localhost:4120";
-            string defaultInputFile = "integration-test.json";
-            bool loop = false;
-            List<string> fileList = new List<string>();
+            ProcessEnvironmentVariables();
 
-            // Get environment variables
-            string env = Environment.GetEnvironmentVariable("RUNWEB");
-            if (!string.IsNullOrEmpty(env))
+            ProcessCommandArgs(args);
+
+            ValidateParameters();
+
+            Smoker.Test smoker = new Smoker.Test(fileList, baseUrl);
+
+            // run one test iteration
+            if (!loop && !runWeb)
             {
-                bool.TryParse(env, out runWeb);
+                if (!smoker.Run().Result)
+                {
+                    Environment.Exit(-1);
+                }
+
+                return;
             }
 
-            env = Environment.GetEnvironmentVariable("THREADS");
-            if (!string.IsNullOrEmpty(env))
+            List<Task> tasks = new List<Task>();
+
+            // run as a web server
+            if (runWeb)
             {
-                int.TryParse(env, out threads);
+                // use the default web host builder + startup
+                IWebHostBuilder builder = WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
+
+                // set the listen port
+                builder.UseUrls(string.Format("http://*:{0}/", 4122));
+
+                // build the host
+                IWebHost host = builder.Build();
+
+                // run the web server
+                tasks.Add(host.RunAsync());
             }
 
-            env = Environment.GetEnvironmentVariable("HOST");
-            if (!string.IsNullOrEmpty(env))
+            // run tests in loop
+            if (loop)
             {
-                baseUrl = env;
+                for (int i = 0; i < threads; i++)
+                {
+                    tasks.Add(smoker.RunLoop(sleepMs));
+                }
             }
 
-            env = Environment.GetEnvironmentVariable("SLEEP");
-            if (!string.IsNullOrEmpty(env))
+            // wait for tasks to complete or ctrl c
+            Task.WaitAll(tasks.ToArray());
+        }
+
+        private static void ValidateParameters()
+        {
+            // make it easier to pass host
+            if (!baseUrl.ToLower().StartsWith("http"))
             {
-                int.TryParse(env, out sleepMs);
+                if (baseUrl.ToLower().StartsWith("localhost"))
+                {
+                    baseUrl = "http://" + baseUrl;
+                }
+                else
+                {
+                    baseUrl = string.Format("https://{0}.azurewebsites.net", baseUrl);
+                }
             }
 
-            env = Environment.GetEnvironmentVariable("FILES");
-            if (!string.IsNullOrEmpty(env))
+            if (sleepMs < 0)
             {
-                // TODO - parse files
+                sleepMs = 0;
             }
 
+            if (threads > 0)
+            {
+                // set loop to true
+                loop = true;
+            }
+
+            if (threads < 0)
+            {
+                threads = 0;
+            }
+
+            // let's not get too crazy
+            if (threads > 10)
+            {
+                threads = 10;
+            }
+
+            // add default file
+            if (fileList.Count == 0)
+            {
+                fileList.Add(defaultInputFile);
+            }
+        }
+
+        private static void ProcessCommandArgs(string[] args)
+        {
             // process the command line args
             if (args.Length > 0)
             {
@@ -62,7 +122,7 @@ namespace HeliumIntegrationTest
                     // display usage
 
                     Usage();
-                    return;
+                    Environment.Exit(0);
                 }
 
                 int i = 0;
@@ -115,7 +175,7 @@ namespace HeliumIntegrationTest
                                 // exit on error
                                 Console.WriteLine("Invalid sleep (millisecond) paramter: {0}\r\n", args[i + 1]);
                                 Usage();
-                                return;
+                                Environment.Exit(-1);
                             }
                         }
 
@@ -131,7 +191,7 @@ namespace HeliumIntegrationTest
                                 // exit on error
                                 Console.WriteLine("Invalid number of threads paramter: {0}\r\n", args[i + 1]);
                                 Usage();
-                                return;
+                                Environment.Exit(-1);
                             }
                         }
                     }
@@ -139,85 +199,45 @@ namespace HeliumIntegrationTest
                     i++;
                 }
             }
+        }
 
-            // make it easier to pass host
-            if (!baseUrl.ToLower().StartsWith("http"))
+        private static void ProcessEnvironmentVariables()
+        {
+            // Get environment variables
+
+            string env = Environment.GetEnvironmentVariable("RUNWEB");
+            if (!string.IsNullOrEmpty(env))
             {
-                if (baseUrl.ToLower().StartsWith("localhost"))
-                {
-                    baseUrl = "http://" + baseUrl;
-                }
-                else
-                {
-                    baseUrl = string.Format("https://{0}.azurewebsites.net", baseUrl);
-                }
+                bool.TryParse(env, out runWeb);
             }
 
-            if (sleepMs < 0)
+            env = Environment.GetEnvironmentVariable("THREADS");
+            if (!string.IsNullOrEmpty(env))
             {
-                sleepMs = 0;
+                int.TryParse(env, out threads);
             }
 
-            if (threads > 0)
+            env = Environment.GetEnvironmentVariable("HOST");
+            if (!string.IsNullOrEmpty(env))
             {
-                // set loop to true
-                loop = true;
+                baseUrl = env;
             }
 
-            if (threads < 1)
+            env = Environment.GetEnvironmentVariable("SLEEP");
+            if (!string.IsNullOrEmpty(env))
             {
-                threads = 1;
+                int.TryParse(env, out sleepMs);
             }
 
-            if (threads > 10)
+            env = Environment.GetEnvironmentVariable("FILES");
+            if (!string.IsNullOrEmpty(env))
             {
-                threads = 10;
+                // TODO - parse files
             }
 
-            if (fileList.Count == 0)
-            {
-                fileList.Add(defaultInputFile);
-                fileList.Add("dotnet.json");
-            }
-
-            Smoker.Test smoker = new Smoker.Test(fileList, baseUrl);
-
-            if (!loop && !runWeb)
-            {
-                if (!smoker.Run().Result)
-                {
-                    Environment.Exit(-1);
-                }
-
-                return;
-            }
-
-            if (runWeb)
-            {
-                List<Task> tasks = new List<Task>();
-
-                // run the smoke test
-                if (loop)
-                {
-                    for (int i = 0; i < threads; i++)
-                    {
-                        tasks.Add(smoker.RunLoop(sleepMs));
-                    }
-                }
-
-                // start the web server
-                IWebHostBuilder builder = WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
-
-                // listen on the port
-                builder.UseUrls(string.Format("http://*:{0}/", 4122));
-
-                IWebHost host = builder.Build();
-                await host.RunAsync();
-
-                return;
-            }
-
-            await smoker.RunLoop(sleepMs);
+            // TODO - remove once parse works
+            fileList.Add(defaultInputFile);
+            fileList.Add("dotnet.json");
         }
 
         // display the usage text
