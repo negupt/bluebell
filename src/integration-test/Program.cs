@@ -212,13 +212,13 @@ namespace HeliumIntegrationTest
         {
             // Get environment variables
 
-            string env = Environment.GetEnvironmentVariable("config.RunWeb");
+            string env = Environment.GetEnvironmentVariable("RUNWEB");
             if (!string.IsNullOrEmpty(env))
             {
                 bool.TryParse(env, out config.RunWeb);
             }
 
-            env = Environment.GetEnvironmentVariable("config.Threads");
+            env = Environment.GetEnvironmentVariable("THREADS");
             if (!string.IsNullOrEmpty(env))
             {
                 int.TryParse(env, out config.Threads);
