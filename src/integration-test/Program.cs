@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace HeliumIntegrationTest
 {
-    public class Program
+    public class App
     {
-        static int sleepMs = 0;
-        static int threads = 0;
+        public static int sleepMs = 0;
+        public static int threads = 0;
+        public static bool loop = false;
+        public static string baseUrl = "http://localhost:4120";
+
         static bool runWeb = false;
-        static string baseUrl = "http://localhost:4120";
         static readonly string defaultInputFile = "integration-test.json";
-        static bool loop = false;
         static readonly List<string> fileList = new List<string>();
 
         public static void Main(string[] args)
