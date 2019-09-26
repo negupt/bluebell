@@ -39,8 +39,8 @@ namespace HeliumIntegrationTest
             app.UseMvc();
 
             // add our custom middleware
-            //app.UseRobots();
-            //app.UseHomePage();
+            app.UseRobots();
+            app.UseHomePage();
         }
     }
 }
