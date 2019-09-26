@@ -4,19 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace testapp.Controllers
+namespace HeliumIntegrationTest.Controllers
 {
     // TODO - dummy controller
 
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ConfigController : ControllerBase
     {
-        // GET api/values
+        // GET Config
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return string.Format("Running: {0}\r\nThreads: {1}\r\nSleepMS: {2}\r\nHost: {3}", App.loop, App.threads, App.sleepMs, App.baseUrl);
         }
 
         //// GET api/values/5
