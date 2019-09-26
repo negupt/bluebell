@@ -8,14 +8,8 @@ namespace HeliumIntegrationTest
 {
     public class App
     {
-        public static int sleepMs = 0;
-        public static int threads = 0;
-        public static bool loop = false;
-        public static string baseUrl = "http://localhost:4120";
-
-        static bool runWeb = false;
         static readonly string defaultInputFile = "integration-test.json";
-        static readonly List<string> fileList = new List<string>();
+        public static readonly Config config = new Config();
 
         public static void Main(string[] args)
         {
@@ -25,10 +19,10 @@ namespace HeliumIntegrationTest
 
             ValidateParameters();
 
-            Smoker.Test smoker = new Smoker.Test(fileList, baseUrl);
+            Smoker.Test smoker = new Smoker.Test(config.FileList, config.Host);
 
             // run one test iteration
-            if (!loop && !runWeb)
+            if (! config.RunLoop && ! config.RunWeb)
             {
                 if (!smoker.Run().Result)
                 {
@@ -41,13 +35,13 @@ namespace HeliumIntegrationTest
             List<Task> tasks = new List<Task>();
 
             // run as a web server
-            if (runWeb)
+            if (config.RunWeb)
             {
                 // use the default web host builder + startup
-                IWebHostBuilder builder = WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
-
-                // set the listen port
-                builder.UseUrls(string.Format("http://*:{0}/", 4122));
+                IWebHostBuilder builder = WebHost.CreateDefaultBuilder(args)
+                    .UseKestrel()
+                    .UseStartup<Startup>()
+                    .UseUrls(string.Format("http://*:4122/"));
 
                 // build the host
                 IWebHost host = builder.Build();
@@ -56,12 +50,12 @@ namespace HeliumIntegrationTest
                 tasks.Add(host.RunAsync());
             }
 
-            // run tests in loop
-            if (loop)
+            // run tests in config.RunLoop
+            if (config.RunLoop)
             {
-                for (int i = 0; i < threads; i++)
+                for (int i = 0; i < config.Threads; i++)
                 {
-                    tasks.Add(smoker.RunLoop(sleepMs));
+                    tasks.Add(smoker.RunLoop(config.SleepMs));
                 }
             }
 
@@ -72,44 +66,45 @@ namespace HeliumIntegrationTest
         private static void ValidateParameters()
         {
             // make it easier to pass host
-            if (!baseUrl.ToLower().StartsWith("http"))
+            if (!config.Host.ToLower().StartsWith("http"))
             {
-                if (baseUrl.ToLower().StartsWith("localhost"))
+                if (config.Host.ToLower().StartsWith("localhost"))
                 {
-                    baseUrl = "http://" + baseUrl;
+                    config.Host = "http://" + config.Host;
                 }
                 else
                 {
-                    baseUrl = string.Format("https://{0}.azurewebsites.net", baseUrl);
+                    config.Host = string.Format("https://{0}.azurewebsites.net", config.Host);
                 }
             }
 
-            if (sleepMs < 0)
+            if (config.SleepMs < 0)
             {
-                sleepMs = 0;
+                config.SleepMs = 0;
             }
 
-            if (threads > 0)
+            if (config.Threads > 0)
             {
-                // set loop to true
-                loop = true;
+                // set config.RunLoop to true
+                config.RunLoop = true;
             }
 
-            if (threads < 0)
+            if (config.Threads < 0)
             {
-                threads = 0;
+                config.Threads = 0;
             }
 
             // let's not get too crazy
-            if (threads > 10)
+            if (config.Threads > 10)
             {
-                threads = 10;
+                config.Threads = 10;
             }
 
-            // add default file
-            if (fileList.Count == 0)
+            // add default files
+            if (config.FileList.Count == 0)
             {
-                fileList.Add(defaultInputFile);
+                config.FileList.Add(defaultInputFile);
+                config.FileList.Add("dotnet.json");
             }
         }
 
@@ -133,7 +128,7 @@ namespace HeliumIntegrationTest
                     // handle web (-w)
                     if (args[i] == "-w")
                     {
-                        runWeb = true;
+                        config.RunWeb = true;
                     }
 
                     // process all other args in pairs
@@ -142,7 +137,7 @@ namespace HeliumIntegrationTest
                         // handle host (-h http://localhost:4120/)
                         if (args[i] == "-h")
                         {
-                            baseUrl = args[i + 1].Trim();
+                            config.Host = args[i + 1].Trim();
                             i++;
                         }
 
@@ -159,15 +154,15 @@ namespace HeliumIntegrationTest
                                     Environment.Exit(-1);
                                 }
 
-                                fileList.Add(file);
+                                config.FileList.Add(file);
                                 i++;
                             }
                         }
 
-                        // handle sleep (-s sleepMS)
+                        // handle sleep (-s config.SleepMs)
                         else if (args[i] == "-s")
                         {
-                            if (int.TryParse(args[i + 1], out sleepMs))
+                            if (int.TryParse(args[i + 1], out config.SleepMs))
                             {
                                 i++;
                             }
@@ -180,17 +175,17 @@ namespace HeliumIntegrationTest
                             }
                         }
 
-                        // handle threads (-t numberThreads)
+                        // handle config.Threads (-t numberconfig.Threads)
                         else if (args[i] == "-t")
                         {
-                            if (int.TryParse(args[i + 1], out threads) && threads > 0 && threads <= 10)
+                            if (int.TryParse(args[i + 1], out config.Threads))
                             {
                                 i++;
                             }
                             else
                             {
                                 // exit on error
-                                Console.WriteLine("Invalid number of threads paramter: {0}\r\n", args[i + 1]);
+                                Console.WriteLine("Invalid number of config.Threads paramter: {0}\r\n", args[i + 1]);
                                 Usage();
                                 Environment.Exit(-1);
                             }
@@ -206,28 +201,28 @@ namespace HeliumIntegrationTest
         {
             // Get environment variables
 
-            string env = Environment.GetEnvironmentVariable("RUNWEB");
+            string env = Environment.GetEnvironmentVariable("config.RunWeb");
             if (!string.IsNullOrEmpty(env))
             {
-                bool.TryParse(env, out runWeb);
+                bool.TryParse(env, out config.RunWeb);
             }
 
-            env = Environment.GetEnvironmentVariable("THREADS");
+            env = Environment.GetEnvironmentVariable("config.Threads");
             if (!string.IsNullOrEmpty(env))
             {
-                int.TryParse(env, out threads);
+                int.TryParse(env, out config.Threads);
             }
 
             env = Environment.GetEnvironmentVariable("HOST");
             if (!string.IsNullOrEmpty(env))
             {
-                baseUrl = env;
+                config.Host = env;
             }
 
             env = Environment.GetEnvironmentVariable("SLEEP");
             if (!string.IsNullOrEmpty(env))
             {
-                int.TryParse(env, out sleepMs);
+                int.TryParse(env, out config.SleepMs);
             }
 
             env = Environment.GetEnvironmentVariable("FILES");
@@ -235,16 +230,12 @@ namespace HeliumIntegrationTest
             {
                 // TODO - parse files
             }
-
-            // TODO - remove once parse works
-            fileList.Add(defaultInputFile);
-            fileList.Add("dotnet.json");
         }
 
         // display the usage text
         private static void Usage()
         {
-            Console.WriteLine("Usage: integration-test [-i file1.json [file2.json] [file3.json] ...] [-h hostUrl] [-s sleepMS] [-t numberOfThreads] [-w] [--help]");
+            Console.WriteLine("Usage: integration-test [-i file1.json [file2.json] [file3.json] ...] [-h hostUrl] [-s config.SleepMs] [-t numberOfconfig.Threads] [-w] [--help]");
         }
     }
 }
