@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Smoker
@@ -52,6 +53,7 @@ namespace Smoker
             DateTime dt;
             HttpRequestMessage req;
             string body;
+            string res = string.Empty;
 
             // send the first request as a warm up
             await Warmup(requestList[0].Url);
@@ -72,6 +74,8 @@ namespace Smoker
                             body = await resp.Content.ReadAsStringAsync();
 
                             Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+
+                            res += string.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
                             // validate the response
                             if (r.Validation != null)
@@ -95,12 +99,67 @@ namespace Smoker
             return isError;
         }
 
-        // run the tests
-        public async Task RunLoop(int sleepMs)
+        public async Task<string> RunOnce(int id)
         {
             DateTime dt;
             HttpRequestMessage req;
             string body;
+            string res = string.Empty;
+
+            // send the first request as a warm up
+            await Warmup(requestList[0].Url);
+
+            // send each request
+            foreach (Request r in requestList)
+            {
+                try
+                {
+                    // create the request
+                    using (req = new HttpRequestMessage(new HttpMethod(r.Verb), MakeUrl(r.Url)))
+                    {
+                        dt = DateTime.Now;
+
+                        // process the response
+                        using (HttpResponseMessage resp = await client.SendAsync(req))
+                        {
+                            body = await resp.Content.ReadAsStringAsync();
+
+                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", id, DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+
+                            res += string.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+
+                            // validate the response
+                            if (r.Validation != null)
+                            {
+                                ValidateContentType(r, resp);
+                                ValidateContentLength(r, resp);
+                                ValidateContains(r, body);
+                                ValidateJson(r, body);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // ignore any error and keep processing
+                    Console.WriteLine("{0}\tException: {1}", DateTime.Now.ToString("MM/dd hh:mm:ss"), ex.Message);
+                }
+            }
+
+            return res;
+        }
+
+        // run the tests
+        public async Task RunLoop(int id, HeliumIntegrationTest.Config config, CancellationToken ct)
+        {
+            DateTime dt;
+            HttpRequestMessage req;
+            string body;
+
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
 
             // send the first request as a warm up
             await Warmup(requestList[0].Url);
@@ -111,6 +170,11 @@ namespace Smoker
                 // send each request
                 foreach (Request r in requestList)
                 {
+                    if (ct.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     try
                     {
                         // create the request
@@ -123,7 +187,7 @@ namespace Smoker
                             {
                                 body = await resp.Content.ReadAsStringAsync();
 
-                                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", id, DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
                                 // validate the response
                                 if (r.Validation != null)
@@ -142,8 +206,18 @@ namespace Smoker
                         Console.WriteLine("{0}\tException: {1}", DateTime.Now.ToString("MM/dd hh:mm:ss"), ex.Message);
                     }
 
+                    if (ct.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     // sleep between each request
-                    System.Threading.Thread.Sleep(sleepMs);
+                    System.Threading.Thread.Sleep(config.SleepMs);
+
+                    if (ct.IsCancellationRequested)
+                    {
+                        return;
+                    }
                 }
             }
         }
