@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeliumIntegrationTest
@@ -10,6 +11,9 @@ namespace HeliumIntegrationTest
     {
         static readonly string defaultInputFile = "integration-test.json";
         public static readonly Config config = new Config();
+        public static readonly List<Task> tasks = new List<Task>();
+        public static readonly List<CancellationTokenSource> tokens = new List<CancellationTokenSource>();
+        public static Smoker.Test smoker;
 
         public static void Main(string[] args)
         {
@@ -19,7 +23,7 @@ namespace HeliumIntegrationTest
 
             ValidateParameters();
 
-            Smoker.Test smoker = new Smoker.Test(config.FileList, config.Host);
+            smoker = new Smoker.Test(config.FileList, config.Host);
 
             // run one test iteration
             if (! config.RunLoop && ! config.RunWeb)
@@ -32,7 +36,7 @@ namespace HeliumIntegrationTest
                 return;
             }
 
-            List<Task> tasks = new List<Task>();
+            Task webTask = null;
 
             // run as a web server
             if (config.RunWeb)
@@ -47,20 +51,27 @@ namespace HeliumIntegrationTest
                 IWebHost host = builder.Build();
 
                 // run the web server
-                tasks.Add(host.RunAsync());
+                webTask = host.RunAsync();
             }
 
             // run tests in config.RunLoop
             if (config.RunLoop)
             {
+                Task t;
+                CancellationTokenSource ct;
+
                 for (int i = 0; i < config.Threads; i++)
                 {
-                    tasks.Add(smoker.RunLoop(config.SleepMs));
+                    ct = new CancellationTokenSource();
+                    t = smoker.RunLoop(i, App.config, ct.Token);
+
+                    tokens.Add(ct);
+                    tasks.Add(t);
                 }
             }
 
-            // wait for tasks to complete or ctrl c
-            Task.WaitAll(tasks.ToArray());
+            // wait for web server to complete or ctrl c
+            webTask.Wait();
         }
 
         private static void ValidateParameters()
