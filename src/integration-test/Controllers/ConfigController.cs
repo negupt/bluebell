@@ -6,42 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeliumIntegrationTest.Controllers
 {
-    // TODO - dummy controller
-
     [Route("api/[controller]")]
     [ApiController]
-    public class ConfigController : ControllerBase
+    public class ConfigController : Controller
     {
-        // GET Config
+        // GET api/values
         [HttpGet]
-        public ActionResult<string> Get()
+        public Config Get()
         {
-            return string.Format("Running: {0}\r\nThreads: {1}\r\nSleepMS: {2}\r\nHost: {3}", App.loop, App.threads, App.sleepMs, App.baseUrl);
+            return App.config;
         }
-
-        //// GET api/values/5
-        //[HttpGet("{id}")]
-        //public ActionResult<string> Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/values
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/values/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/values/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }
