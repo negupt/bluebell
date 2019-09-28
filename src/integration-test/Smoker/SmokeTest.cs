@@ -73,7 +73,10 @@ namespace Smoker
                         {
                             body = await resp.Content.ReadAsStringAsync();
 
-                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                            //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+
+                            // date time is redundant for web log
+                            Console.WriteLine("{0}\t{1}\t{2}\t{3}", (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
                             res += string.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
@@ -131,10 +134,10 @@ namespace Smoker
                             // validate the response
                             if (r.Validation != null)
                             {
-                                ValidateContentType(r, resp);
-                                ValidateContentLength(r, resp);
-                                ValidateContains(r, body);
-                                ValidateJson(r, body);
+                                res += ValidateContentType(r, resp);
+                                res += ValidateContentLength(r, resp);
+                                res += ValidateContains(r, body);
+                                res += ValidateJson(r, body);
                             }
                         }
                     }
@@ -244,26 +247,34 @@ namespace Smoker
         }
 
         // validate the content type header if specified in the test
-        public void ValidateContentType(Request r, HttpResponseMessage resp)
+        public string ValidateContentType(Request r, HttpResponseMessage resp)
         {
+            string res = string.Empty;
+
             if (!string.IsNullOrEmpty(r.ContentType))
             {
                 if (!resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType))
                 {
-                    Console.WriteLine("\tValidation Failed: ContentType: {0}", resp.Content.Headers.ContentType);
+                    res += string.Format("\tValidation Failed: ContentType: {0}\r\n", resp.Content.Headers.ContentType);
                 }
             }
+
+            Console.Write(res);
+
+            return res;
         }
 
         // validate the content length range if specified in test
-        public void ValidateContentLength(Request r, HttpResponseMessage resp)
+        public string ValidateContentLength(Request r, HttpResponseMessage resp)
         {
+            string res = string.Empty;
+
             // validate the content min length if specified in test
             if (r.Validation.MinLength > 0)
             {
                 if (resp.Content.Headers.ContentLength < r.Validation.MinLength)
                 {
-                    Console.WriteLine("\tValidation Failed: MinContentLength: {0}", resp.Content.Headers.ContentLength);
+                    res = string.Format("\tValidation Failed: MinContentLength: {0}\r\n", resp.Content.Headers.ContentLength);
                 }
             }
 
@@ -272,14 +283,20 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
-                    Console.WriteLine("\tValidation Failed: MaxContentLength: {0}", resp.Content.Headers.ContentLength);
+                    res += string.Format("\tValidation Failed: MaxContentLength: {0}\r\n", resp.Content.Headers.ContentLength);
                 }
             }
+
+            Console.Write(res);
+
+            return res;
         }
 
         // validate the contains rules
-        public void ValidateContains(Request r, string body)
+        public string ValidateContains(Request r, string body)
         {
+            string res = string.Empty;
+
             if (!string.IsNullOrEmpty(body) && r.Validation.Contains != null && r.Validation.Contains.Count > 0)
             {
                 // validate each rule
@@ -288,15 +305,21 @@ namespace Smoker
                     // compare values
                     if (!body.Contains(c.Value, c.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                     {
-                        Console.WriteLine("\tValidation Failed: Contains: {0}", c.Value.PadRight(40).Substring(0, 40).Trim());
+                        res += string.Format("\tValidation Failed: Contains: {0}\r\n", c.Value.PadRight(40).Substring(0, 40).Trim());
                     }
                 }
             }
+
+            Console.Write(res);
+
+            return res;
         }
 
         // run json validation rules
-        public void ValidateJson(Request r, string body)
+        public string ValidateJson(Request r, string body)
         {
+            string res = string.Empty;
+
             if (r.Validation.Json != null)
             {
                 if (r.Validation.Json.MinLength > 0 || r.Validation.Json.MaxLength > 0)
@@ -308,16 +331,20 @@ namespace Smoker
                     // validate min length
                     if (r.Validation.Json.MinLength > 0 && r.Validation.Json.MinLength > resList.Count)
                     {
-                        Console.WriteLine("\tValidation Failed: MinJsonCount: {0}", resList.Count);
+                        res += string.Format("\tValidation Failed: MinJsonCount: {0}\r\n", resList.Count);
                     }
 
                     // validate max length
                     if (r.Validation.Json.MaxLength > 0 && r.Validation.Json.MaxLength < resList.Count)
                     {
-                        Console.WriteLine("\tValidation Failed: MaxJsonCount: {0}", resList.Count);
+                        res += string.Format("\tValidation Failed: MaxJsonCount: {0}\r\n", resList.Count);
                     }
                 }
             }
+
+            Console.Write(res);
+
+            return res;
         }
 
         // read json test file
