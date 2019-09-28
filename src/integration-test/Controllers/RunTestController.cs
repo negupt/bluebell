@@ -16,7 +16,7 @@ namespace HeliumIntegrationTest.Controllers
         {
             Response.ContentType = "text/plain";
 
-            return await App.smoker.RunOnce(App.tokens.Count);
+            return await App.smoker.RunFromWebRequest(App.tokens.Count);
         }
     }
 }

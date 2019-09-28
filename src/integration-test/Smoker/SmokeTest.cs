@@ -53,7 +53,6 @@ namespace Smoker
             DateTime dt;
             HttpRequestMessage req;
             string body;
-            string res = string.Empty;
 
             // send the first request as a warm up
             await Warmup(requestList[0].Url);
@@ -73,12 +72,8 @@ namespace Smoker
                         {
                             body = await resp.Content.ReadAsStringAsync();
 
-                            //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
-                            // date time is redundant for web log
-                            Console.WriteLine("{0}\t{1}\t{2}\t{3}", (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
-
-                            res += string.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
                             // validate the response
                             if (r.Validation != null)
@@ -102,7 +97,7 @@ namespace Smoker
             return isError;
         }
 
-        public async Task<string> RunOnce(int id)
+        public async Task<string> RunFromWebRequest(int id)
         {
             DateTime dt;
             HttpRequestMessage req;
@@ -127,7 +122,7 @@ namespace Smoker
                         {
                             body = await resp.Content.ReadAsStringAsync();
 
-                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", id, DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", id, (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
                             res += string.Format("{0}\t{1}\t{2}\t{3}\t{4}\r\n", DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
 
@@ -190,7 +185,15 @@ namespace Smoker
                             {
                                 body = await resp.Content.ReadAsStringAsync();
 
-                                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", id, DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                                // datetime is redundant for web app
+                                if (config.RunWeb)
+                                {
+                                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", id, (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", id, DateTime.Now.ToString("MM/dd hh:mm:ss"), (int)resp.StatusCode, (int)DateTime.Now.Subtract(dt).TotalMilliseconds, resp.Content.Headers.ContentLength, r.Url);
+                                }
 
                                 // validate the response
                                 if (r.Validation != null)
