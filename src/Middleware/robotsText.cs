@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace fourCo.Middleware
+namespace Helium
 {
     public static class RobotsMiddlewareExtensions
     {
