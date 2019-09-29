@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using System.Collections.Generic;
 
-namespace fourCo.Middleware
+namespace Helium
 {
     public static class HomePageMiddlewareExtensions
     {
