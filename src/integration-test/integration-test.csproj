@@ -8,11 +8,11 @@
 
    <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.App" />
-      <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
    </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\middleware\src\middleware.csproj" />
+    <Compile Include="..\middleware\src\indexHandler.cs" Link="Middleware/indexHandler.cs" />
+    <Compile Include="..\middleware\src\robotsHandler.cs" Link="Middleware/robotsHandler.cs" />
   </ItemGroup>
 
   <ItemGroup>
