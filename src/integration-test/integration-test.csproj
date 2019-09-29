@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <Compile Include="..\middleware\indexHandler.cs" Link="middleware/indexHandler.cs" />
-    <Compile Include="..\middleware\robotsHandler.cs" Link="middleware/robotsHandler.cs" />
+    <Compile Include="..\middleware\robotsText.cs" Link="middleware/robotsText.cs" />
   </ItemGroup>
 
   <ItemGroup>
