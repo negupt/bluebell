@@ -186,7 +186,7 @@ namespace HeliumIntegrationTest
                             }
                         }
 
-                        // handle config.Threads (-t numberconfig.Threads)
+                        // handle config.Threads (-t config.Threads)
                         else if (args[i] == "-t")
                         {
                             if (int.TryParse(args[i + 1], out config.Threads))
@@ -246,7 +246,7 @@ namespace HeliumIntegrationTest
         // display the usage text
         private static void Usage()
         {
-            Console.WriteLine("Usage: integration-test [-i file1.json [file2.json] [file3.json] ...] [-h hostUrl] [-s config.SleepMs] [-t numberOfconfig.Threads] [-w] [--help]");
+            Console.WriteLine("Usage: integration-test [-i file1.json [file2.json] [file3.json] ...] [-h hostUrl] [-s sleepMs] [-t numberOfThreads] [-w] [--help]");
         }
     }
 }
