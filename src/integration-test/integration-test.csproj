@@ -12,6 +12,10 @@
    </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\middleware\src\middleware.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
      <None Update="dotnet.json">
        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
      </None>
