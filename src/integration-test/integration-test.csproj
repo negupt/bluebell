@@ -11,8 +11,8 @@
    </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\middleware\src\indexHandler.cs" Link="Middleware/indexHandler.cs" />
-    <Compile Include="..\middleware\src\robotsHandler.cs" Link="Middleware/robotsHandler.cs" />
+    <Compile Include="..\middleware\indexHandler.cs" Link="middleware/indexHandler.cs" />
+    <Compile Include="..\middleware\robotsHandler.cs" Link="middleware/robotsHandler.cs" />
   </ItemGroup>
 
   <ItemGroup>
