@@ -60,7 +60,7 @@ variables:
 
   # You can change this name to use an existing ACR service connection
 
-  dockerRegistryServiceConnection: 'helium-acr'
+  dockerRegistryServiceConnection: 'helium'
 
 
 
