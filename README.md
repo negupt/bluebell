@@ -437,6 +437,67 @@ Adding a pipeline
 * Select the repo that your code was forked to
 * Click run
 
+## Automate DevOps CI/CD using CLI
+
+# DevOps CLI Commands are in Preview
+# Org can't be created through CLI
+# No direct command to create ACR Service Connection. We have to invoke it through JSON
+
+export He_DevOps_Org="https://dev.azure.com/helium-ci-cd"
+export He_DevOps_Prj="CI-1"
+export He_DevOps_Pipl="Pipline-1"
+export He_DevOps_Repo="https://github.com/negupt/bluebell"
+export He_DevOps_Yaml="azure-pipelines.yml"
+export He_DevOps_BuildId=1
+
+
+#1. Install Azure DevOps Extensions to run DevOps commands 
+az extension add --name azure-devops
+   #https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
+
+
+# 2. Please use below command to login to Azure Portal if you are not already loggedIn
+#az login 
+
+
+# 3. Create a new Azure DevOps Project
+az devops project create --name $He_DevOps_Prj --org  $He_DevOps_Org --source-control git --visibility { Private , Public }
+   #https://docs.microsoft.com/en-us/cli/azure/ext/azure-devops/devops/project?view=azure-cli-latest
+
+	
+# 4. Set DevOps Organization and Project name
+az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Prj
+   #https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
+
+
+#5. Create ACR Service Connection
+# Set DevOps Environment variable 
+#export AZURE_DEVOPS_EXT_GITHUB_PAT='wg5xabxuz4kuqg5psmxelbmkek2rmkrpud746y455wsjocl3vg7a'
+az devops service-endpoint create --service-endpoint-configuration D:\CSE\CICD\acr_sample.txt 
+   #https://docs.microsoft.com/en-us/cli/azure/ext/azure-devops/devops/service-endpoint?view=azure-cli-latest#ext-azure-devops-az-devops-service-endpoint-create
+
+
+# az acr show --name  <registryname> to get scope id
+# az account show -- to get tenant id 
+
+# 6. Create & Run DevOps CI pipeline 
+az pipelines create --name $He_DevOps_Pipl --branch master --repository $He_DevOps_Repo --repository-type github --yaml-path  $He_DevOps_Yaml
+
+
+# ---   -o json --query id
+# https://docs.microsoft.com/en-us/cli/azure/ext/azure-devops/pipelines?view=azure-cli-latest
+
+
+
+# 7. To see the Pipline run progress 
+az pipelines build show --id 5 --open
+# az pipelines runs list
+
+
+
+
+
+
 ## Key concepts
 
 This sample is an ASP.NET Core WebAPI application designed to "fork and code" with the following features:
