@@ -1,0 +1,30 @@
+{
+    "authorization": {
+        "scheme": "ServicePrincipal",
+        "parameters": {
+            "loginServer": "__loginserver__",
+            "scope": "__scope__",
+            "tenantId": "__tenantid__"
+        }
+    },
+    "createdBy": null,
+    "data": {
+        "appObjectId": "",
+        "azureSpnPermissions": "",
+        "azureSpnRoleAssignmentId": "",
+        "registryId": "__regid__",
+        "registrytype": "__regtype__",
+        "spnObjectId": "",
+        "subscriptionId": "__subid__",
+        "subscriptionName": "__subname__"
+    },
+    "description": "",
+    "groupScopeId": null,
+    "name": "__name__",
+    "operationStatus": null,
+    "readersGroup": null,
+    "serviceEndpointProjectReferences": null,
+    "type": "__type__",
+    "url": "__url__",
+    "isShared": "__isShared__"
+}
