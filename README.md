@@ -437,13 +437,14 @@ Adding a pipeline
 * Select the repo that your code was forked to
 * Click run
 
-```bash
+
 # Automate CI/CD Project creation, Pipeline creation and Pipeline run using CLI
 
 * DevOps CLI Commands are in Preview
 * Please create ([Organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops)) if its not already done. Org can not be created through DevOps CLI commands
 * No direct command to create ACR Service Connection. We have to invoke it through JSON
 
+```bash
 # Please set the following variables 
 export He_DevOps_Org=""  # Set your Organization. e.g. "https://dev.azure.com/helium-ci-cd"
 export He_DevOps_Prj="" # Set your Project Name e.g. "PrjCICD"
