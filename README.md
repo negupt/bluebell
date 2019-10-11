@@ -468,7 +468,7 @@ az devops project create --name $He_DevOps_Prj --org  $He_DevOps_Org --source-co
 az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Prj
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
 
-# 5. Create Azure Container Registry (ACR)  Service Connection
+# 5. Create Azure Container Registry (ACR)  Service Connection under project settings 
     # a. Copy script from acr_sample_params.json file and replace parameter values with actual values from your environment and run these commands as a batch. Please go to step #b and #c to get these values.
 
     # b. Please use below command to get scope id
