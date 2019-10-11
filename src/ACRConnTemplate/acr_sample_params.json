@@ -8,4 +8,4 @@ sed -i s/__subname__/placeyourvaluehere/g acr_sample.json
 sed -i s/__name__/placeyourvaluehere/g acr_sample.json
 sed -i s/__type__/placeyourvaluehere/g acr_sample.json
 sed -i s/__url__/placeyourvaluehere/g acr_sample.json
-sed -i s/__isShared__/false/g acr_sample.json
+sed -i s/__isShared__/placeyourvaluehere/g acr_sample.json

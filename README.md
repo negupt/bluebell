@@ -469,6 +469,9 @@ az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Pr
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
 
 # 5. Create Azure Container Registry (ACR)  Service Connection
+    # 1. Copy script from acr_sample_params.json file and replace it with values from your environment and run these commands as a batch.
+
+    # 2.  run following command
 az devops service-endpoint create --service-endpoint-configuration $He_DevOps_Service_Conn_File
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/cli/azure/ext/azure-devops/devops/service-endpoint?view=azure-cli-latest#ext-azure-devops-az-devops-service-endpoint-create
 
