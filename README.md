@@ -451,7 +451,7 @@ export He_DevOps_Prj="" # Set your Project Name e.g. "PrjCICD"
 export He_DevOps_Pipl="" # Set your Pipline Name e.g. "Pipline1"
 export He_DevOps_Repo=""  # Set your Repo Name e.g. https://github.com/negupt/bluebell"
 export He_DevOps_Yml=""  # Set Path to YML file e.g. "azure-pipelines.yml"
-
+export He_DevOps_Service_Conn_File=""  # Set Path to YML file e.g. "D:\CICD\acr_sample.txt "
 
 # 1. Install Azure DevOps Extensions to run DevOps commands 
 az extension add --name azure-devops
@@ -469,7 +469,7 @@ az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Pr
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
 
 # 5. Create Azure Container Registry (ACR)  Service Connection
-az devops service-endpoint create --service-endpoint-configuration D:\CSE\CICD\acr_sample.txt 
+az devops service-endpoint create --service-endpoint-configuration $He_DevOps_Service_Conn_File
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/cli/azure/ext/azure-devops/devops/service-endpoint?view=azure-cli-latest#ext-azure-devops-az-devops-service-endpoint-create
 
 # Please use below command to get scope id
