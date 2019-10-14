@@ -438,8 +438,8 @@ Adding a pipeline
 * Click run
 
 
-# Automate CI/CD using CLI
-* Project creation, Pipeline creation, ACR Service Connection creation & configuration and Pipeline run.
+# Automate CI/CD using DevOps CLI commands
+* Project creation, Pipeline creation, ACR service connection creation & configuration and Pipeline run.
 * DevOps CLI Commands are in Preview
 * Please create [Organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops) if its not already done. Org can not be created through DevOps CLI commands
 
@@ -463,7 +463,7 @@ az login
 az devops project create --name $He_DevOps_Prj --org  $He_DevOps_Org --source-control git --visibility { Private , Public }
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/cli/azure/ext/azure-devops/devops/project?view=azure-cli-latest
 	
-# 4. Set DevOps Organization and Project Name
+# 4. Set DevOps Organization and Project
 az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Prj
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
 
@@ -471,10 +471,10 @@ az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Pr
     # No direct CLI command to create ACR Service Connection. We will invoke it through ACR Service Connection template 
     # Replace Parameters values in acr_sample_params.json file with your actual environment values and run sed commands as a batch from CLI. Please follow below steps to get required values.
 
-    #Please use below command to get scope and login server. registryId and scope will have same values.
-     az acr show --name <registryname>  # e.g. CICD12
+    # Please use below command to get scope and login server. registryId and scope will have same values.
+     az acr show --name <registryname>  # e.g. CICD12. If you are following all steps from the begnining then you can also use $$He_Name
 
-    #Please use below command to get tenant id , Subscription id and Subscription Name
+    # Please use below command to get tenant id, Subscription id and Subscription Name
      az account show
 
     # Run following command to create ACR Service Connection
