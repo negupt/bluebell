@@ -2,9 +2,9 @@
     "authorization": {
         "scheme": "ServicePrincipal",
         "parameters": {
-            "loginServer": "__loginserver__",
-            "scope": "__scope__",
-            "tenantId": "__tenantid__"
+            "loginServer": "cicd12.azurecr.io",
+            "scope": "/subscriptions/698e7133-d0be-44f4-bc25-76e2296b0fb0/resourceGroups/cicd12-rg-acr/providers/Microsoft.ContainerRegistry/registries/cicd12",
+            "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47"
         }
     },
     "createdBy": null,
@@ -12,11 +12,11 @@
         "appObjectId": "",
         "azureSpnPermissions": "",
         "azureSpnRoleAssignmentId": "",
-        "registryId": "__regid__",
-        "registrytype": "__regtype__",
+        "registryId": "/subscriptions/698e7133-d0be-44f4-bc25-76e2296b0fb0/resourceGroups/cicd12-rg-acr/providers/Microsoft.ContainerRegistry/registries/cicd12",
+        "registrytype": "ACR",
         "spnObjectId": "",
-        "subscriptionId": "__subid__",
-        "subscriptionName": "__subname__"
+        "subscriptionId": "698e7133-d0be-44f4-bc25-76e2296b0fb0",
+        "subscriptionName": "My Microsoft Azure Internal Consumption"
     },
     "description": "",
     "groupScopeId": null,
@@ -24,7 +24,7 @@
     "operationStatus": null,
     "readersGroup": null,
     "serviceEndpointProjectReferences": null,
-    "type": "__type__",
-    "url": "__url__",
-    "isShared": "__isShared__"
+    "type": "dockerregistry",
+    "url": "https://cicd12.azurecr.io",
+    "isShared": "false"
 }

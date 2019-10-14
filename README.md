@@ -438,7 +438,7 @@ Adding a pipeline
 * Click run
 
 
-# Automate CI/CD using DevOps CLI commands
+# CI/CD using DevOps CLI commands
 * Project creation, Pipeline creation, ACR service connection creation & configuration and Pipeline run.
 * DevOps CLI Commands are in Preview
 * Please create [Organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops) if its not already done. Org can not be created through DevOps CLI commands
@@ -469,7 +469,12 @@ az devops configure --defaults organization=$He_DevOps_Org project=$He_DevOps_Pr
 
 # 5. Create Azure Container Registry (ACR) Service Connection
     # No direct CLI command to create ACR Service Connection. We will invoke it through ACR Service Connection template 
-    # Replace Parameters values in acr_sample_params.json file with your actual environment values and run sed commands as a batch from CLI. Please follow below steps to get required values.
+    # Replace Parameters values in acr_sample_params.sh file with your actual environment values and execute the file in shell.
+    # Please make sure you are in SRC/ACRConnTemplate folder to execute below commands.
+        chmod 755 acr_sample_params.sh
+        ./acr_sample_params.sh
+
+    # Please follow below steps to get required values.
 
     # Please use below command to get scope and login server. registryId and scope will have same values.
      az acr show --name <registryname>  # e.g. CICD12. If you are following all steps from the begnining then you can also use $$He_Name
