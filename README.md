@@ -447,7 +447,7 @@ Adding a pipeline
 # Please set the following variables 
 export He_DevOps_Org=""  # Set your Organization. e.g. "https://dev.azure.com/helium-ci-cd"
 export He_DevOps_Prj="" # Set your Project Name e.g. "PrjCICD"
-export He_DevOps_Pipl="" # Set your Pipline Name e.g. "Pipeline1"
+export He_DevOps_Pipl="" # Set your Pipeline Name e.g. "Pipeline1"
 export He_DevOps_Repo=""  # Set your Repo Name e.g. https://github.com/negupt/bluebell"
 export He_DevOps_Yml=""  # Set Path to YML file e.g. "azure-pipelines.yml"
 export He_DevOps_Service_Conn_File=""  # Set your ACR service connection template files path e.g. "acr_sample.json"
