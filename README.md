@@ -456,7 +456,7 @@ export He_DevOps_Service_Conn_File=""  # Set your ACR service connection templat
 az extension add --name azure-devops
    # Please check this link to learn more about this command - https://docs.microsoft.com/en-us/azure/devops/cli/get-started?view=azure-devops
 
-# 2. Please use below command to login to Azure Portal if you have not already loggedIn
+# 2. Please use below command to login to Azure Portal if you have not already loggedIn. This is required to get parameter values for step #5.
 az login 
 
 # 3. Create a new Azure DevOps Project
