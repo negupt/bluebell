@@ -441,7 +441,7 @@ Adding a pipeline
 # Automate CI/CD using CLI
 * Project creation, Pipeline creation, ACR Service Connection creation & configuration and Pipeline run.
 * DevOps CLI Commands are in Preview
-* Please create ([Organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops)) if its not already done. Org can not be created through DevOps CLI commands
+* Please create [Organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops) if its not already done. Org can not be created through DevOps CLI commands
 
 ```bash
 # Please set the following variables 
